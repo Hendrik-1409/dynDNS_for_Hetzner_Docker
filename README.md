@@ -18,6 +18,9 @@ This Docker Container checks in a configured Intervall if the public IP-Adress o
 - requests Version 2.32.3
 
 ## Know Issues
+- Any Failure of an HTTP request to the Hetzner API might result in unpredicatble behavior
+- Having more than one DNS Zone has not been test and therefore might result in unpredictable behavior
+- No logging of events is present in this Version. Investigation of non expected behavior might be impossible
 
 ---
 ---
