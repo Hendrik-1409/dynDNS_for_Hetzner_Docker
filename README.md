@@ -3,6 +3,10 @@
 This Docker Container checks in a configured Intervall if the public IP-Adress of the local Network it is running in has changed. If this is the case multiple HTTP request are used to get the necessery Information on the www and @ record of the configured Domain. The domain configuartion API of the Hetzner Account that is correlated to the Domain needs to be reachable with the configured API Key.
 
 ## How to
+1. Rename the config_blank.json to config.json
+2. Insert your Domain for which you want the www and @ DNS Records to be dynamically update. I recommend setting the TTL (Time To Live) of the records to something like 120s to enshure changes will be active in an acceptable timeframe.
+3. Insert your API Key in the config.json as well.
+4. The Intervall can be left untouched
 
 ## Current functionallity
 
