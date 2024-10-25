@@ -68,6 +68,14 @@ def preparePayload():
     rootRecord["value"] = currentIP
     wwwRecord["value"] = currentIP
 
+def runCheckup():
+    global currentIP
+    ip = getIP()
+    if currentIP != ip:
+        currentIP = ip
+        preparePayload()
+        updateRecord()
+
 def updateRecord():
     try:
         response = requests.put(
@@ -84,11 +92,11 @@ def updateRecord():
     except requests.exceptions.RequestException:
         pass #TODO: LOGGER
 
-loadConfig()
-while True:
-    ip = getIP()
-    if currentIP != ip:
-        currentIP = ip
-        preparePayload()
-        updateRecord()
-    time.sleep(interval)
+def main():
+    loadConfig()
+    while True:
+        runCheckup()
+        time.sleep(interval)
+
+if __name__ == "__main__":
+    main()
