@@ -1,13 +1,18 @@
+import logging.config
 import requests
 import time
 import json
+import logging
 
 currentIP = '0.0.0.0'
 zone = {}
 rootRecord = {}
 wwwRecord = {}
 
-#TODO: add LOGGER
+logging.config.fileConfig("logging.conf")
+
+#create Logger
+logger = logging.getLogger("HetznerDynDNS")
 
 def loadConfig():
     configFile = open('config.json')
