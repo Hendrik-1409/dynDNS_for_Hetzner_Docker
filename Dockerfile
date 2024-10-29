@@ -7,5 +7,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY config.json .
 COPY hetznerDNS.py .
+COPY logging.config .
 
 CMD [ "python", "./hetznerDNS.py" ]
