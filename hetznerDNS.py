@@ -10,12 +10,16 @@ wwwRecord = {}
 #TODO: add LOGGER
 
 def loadConfig():
-    configFile = open('config.json')
-    config = json.load(configFile)
+    try:
+        configFile = open('config.json')
+        config = json.load(configFile)
+    except: exit(1); #TODO: LOGGER
     global interval, apitoken, domain
-    interval = config["interval"]
-    apitoken = config["apitoken"]
-    domain = config["domain"]
+    try:
+        interval = config["interval"]
+        apitoken = config["apitoken"]
+        domain = config["domain"]
+    except: exit(1); #TODO: LOGGER
 
 #gets Public IP and returns it as string
 def getIP():
