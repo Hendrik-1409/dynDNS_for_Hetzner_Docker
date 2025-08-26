@@ -3,13 +3,17 @@ import requests
 import time
 import json
 import logging
+import yaml
 
 currentIP = '0.0.0.0'
 zone = {}
 rootRecord = {}
 wwwRecord = {}
 
-logging.config.fileConfig("logging.conf")
+#load logging config
+with open("logging.yaml", "r") as f:
+    logging_config = yaml.load(f, Loader=yaml.FullLoader)
+logging.config.dictConfig(logging_config)
 
 #create Logger
 logger = logging.getLogger("HetznerDynDNS")
@@ -22,13 +26,13 @@ def loadConfig():
     apitoken = config["apitoken"]
     domain = config["domain"]
 
-#gets Public IP and returns it as string
 def getIP():
     try:
         response = requests.get('https://api.ipify.org').text
-        print(response)
+        logging.debug("Public IP: " + response)
     except requests.exceptions.RequestException:
-        pass #TODO: LOGGER
+        logger.error("Failed to get public IP")
+        return -1
     return response
 
 #uses HetznerAPI to get all Zones, finds the correct one using the name and safes corresponding Zone and values in global Variables
@@ -45,7 +49,9 @@ def getZoneID():
                 zone = x
                 break
     except requests.exceptions.RequestException:
-        pass #TODO: LOGGER
+        logger.error("Failed to get ZoneID")
+        return -1
+    return 0
 
 def getRecords():
     try:
@@ -65,20 +71,31 @@ def getRecords():
                     global wwwRecord
                     wwwRecord = x
     except requests.exceptions.RequestException:
-        pass #TODO: LOGGER
+        logger.error("Failed to get Records")
+        return -1
+    return 0
 
 def preparePayload():
-    getZoneID()
-    getRecords()
+    getZoneIDStatus = getZoneID()
+    if getZoneIDStatus == -1:
+        return -1
+    getRecordsStatus = getRecords()
+    if getRecordsStatus == -1:
+        return -1
     rootRecord["value"] = currentIP
     wwwRecord["value"] = currentIP
 
 def runCheckup():
     global currentIP
     ip = getIP()
+    if ip == -1:
+        return
     if currentIP != ip:
+        logger.info("IP changed from " + currentIP + " to " + ip)
         currentIP = ip
-        preparePayload()
+        preparePayloadStatus = preparePayload()
+        if preparePayloadStatus == -1:
+            return
         updateRecord()
 
 def updateRecord():
@@ -95,10 +112,16 @@ def updateRecord():
         )
         #TODO: Analyze for failedRecords | LOGGER
     except requests.exceptions.RequestException:
-        pass #TODO: LOGGER
+        logger.error("Failed to update Record")
 
 def main():
-    loadConfig()
+    logging.info("Starting Script...")
+    try:
+        loadConfig()
+    except:
+        logging.critical("Config could not be loaded!")
+        exit()
+    logging.info("Loaded Config...")
     while True:
         runCheckup()
         time.sleep(interval)
