@@ -1,0 +1,6 @@
+services:
+    dyndns_for_hetzner:
+        build: .
+        restart: unless-stopped
+        volumes:
+            - logs:/var/log/dyndns_for_hetzner
